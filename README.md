@@ -1,5 +1,7 @@
 # ToDo AFL — Desafio Técnico Fullstack
 
+[![CI](https://github.com/Artjosh/AFL-ToDo/actions/workflows/ci.yml/badge.svg)](https://github.com/Artjosh/AFL-ToDo/actions/workflows/ci.yml)
+
 Aplicação de tarefas **colaborativa, estilo Trello/Jira** (board Kanban com
 drag-and-drop, projetos aninhados e compartilhamento entre usuários), com
 **autenticação passwordless (magic link + OTP)**, **backend Python (FastAPI)**

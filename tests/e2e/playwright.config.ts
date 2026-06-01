@@ -14,7 +14,12 @@ const BACKEND_DIR = path.resolve(__dirname, "../../backend");
 const FRONTEND_DIR = path.resolve(__dirname, "../../frontend");
 const E2E_DB = path.resolve(__dirname, "e2e.db");
 
-const PYTHON = path.join(BACKEND_DIR, ".venv", "Scripts", "python.exe");
+// Caminho do Python da venv do backend, compatível com Windows e Linux/macOS
+// (no CI roda em Linux: .venv/bin/python; no Windows: .venv/Scripts/python.exe).
+const PYTHON =
+  process.platform === "win32"
+    ? path.join(BACKEND_DIR, ".venv", "Scripts", "python.exe")
+    : path.join(BACKEND_DIR, ".venv", "bin", "python");
 
 export default defineConfig({
   testDir: "./specs",
