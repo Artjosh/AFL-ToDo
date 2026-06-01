@@ -1,0 +1,10 @@
+# Dependências de desenvolvimento/testes do backend.
+# Instale com: pip install -r requirements-dev.txt
+-r requirements.txt
+
+pytest==8.3.4
+pytest-cov==6.0.0
+fakeredis==2.26.1
+
+# Painel web para inspecionar o banco SQLite em dev (ferramenta, não usada em prod).
+sqlite-web==0.6.4

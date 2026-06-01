@@ -1,0 +1,6 @@
+Migrations do banco gerenciadas pelo Alembic.
+
+Comandos úteis (rodar a partir da pasta backend/ com a venv ativada):
+  alembic upgrade head          # aplica todas as migrations
+  alembic revision --autogenerate -m "mensagem"   # cria nova migration
+  alembic downgrade -1          # desfaz a última migration

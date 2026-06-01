@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Banco SQLite local
+*.db
+*.sqlite3
+app.db
+
+# Variáveis de ambiente (NUNCA comitar)
+.env
+
+# Caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
