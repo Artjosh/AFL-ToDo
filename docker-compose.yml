@@ -1,0 +1,70 @@
+# ==========================================================
+# Stack completa: Redis + Backend (FastAPI) + Frontend (Next.js)
+#
+# - O SQLite continua sendo a fonte de verdade (volume persistente em db_data).
+# - O Redis acelera os tokens de login efêmeros (TTL), habilita rate limit e o
+#   realtime do board (Pub/Sub) — funcionando entre múltiplas réplicas do backend.
+# - Sem Redis o app ainda roda; aqui ele vem incluso por padrão.
+#
+# Uso:  docker compose up --build
+# ==========================================================
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      # SQLite no volume persistente
+      DATABASE_URL: sqlite:////data/app.db
+      # Redis para tokens efêmeros, rate limit e realtime
+      REDIS_URL: redis://redis:6379/0
+      # Segredo de sessão — troque em produção!
+      JWT_SECRET: ${JWT_SECRET:-change-me-em-producao}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      BACKEND_PUBLIC_URL: ${BACKEND_PUBLIC_URL:-http://localhost:8000}
+      # SMTP (Brevo) — opcional; sem isso, roda em modo dev
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      # Supabase (opcional)
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY:-}
+      SUPABASE_JWT_ISSUER: ${SUPABASE_JWT_ISSUER:-}
+      SUPABASE_JWKS_URL: ${SUPABASE_JWKS_URL:-}
+      SUPABASE_JWT_AUDIENCE: ${SUPABASE_JWT_AUDIENCE:-authenticated}
+    volumes:
+      - db_data:/data
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  db_data:
+  redis_data:

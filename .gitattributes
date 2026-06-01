@@ -1,0 +1,11 @@
+# Normaliza quebras de linha: LF no repositório, conversão automática local.
+* text=auto eol=lf
+
+# Binários (não normalizar)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.db binary

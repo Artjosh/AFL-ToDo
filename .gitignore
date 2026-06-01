@@ -1,0 +1,41 @@
+# Dependências
+node_modules/
+.venv/
+venv/
+
+# Build
+.next/
+out/
+build/
+dist/
+
+# Banco SQLite
+*.db
+*.sqlite3
+
+# Variáveis de ambiente
+.env
+.env.local
+.env*.local
+
+# Caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.tsbuildinfo
+
+# Testes (artefatos)
+test-results/
+playwright-report/
+playwright/.cache/
+coverage/
+.coverage
+htmlcov/
+
+# SO / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
