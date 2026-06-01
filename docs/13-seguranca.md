@@ -6,7 +6,7 @@
 - **Sessão com expiração** (JWT, `ACCESS_TOKEN_EXPIRE_MINUTES`).
 - **Magic link / OTP com expiração curta** (`MAGIC_LINK_EXPIRE_MINUTES`), **uso
   único** e **limite de tentativas** de OTP (`OTP_MAX_ATTEMPTS`).
-- **Sem senha armazenada** — elimina toda uma classe de riscos.
+- **Sem senha armazenada** — não há hash de senha no banco.
 - **Validação de ownership/membership** em todas as rotas — um usuário só acessa
   o que é dele ou foi compartilhado (respostas `404` para itens de outros, sem
   vazar existência).
@@ -40,10 +40,12 @@ gerenciado pelos route handlers do Next (`app/api/auth/*`).
 - **Gating SSR:** o `middleware.ts` redireciona `/dashboard` → `/login` (e
   vice-versa) com base na presença do cookie, sem flash de conteúdo.
 
-**Ganho:** mesmo com um XSS, não há token de sessão acessível via
-`document`/`localStorage` para ser roubado.
+Como o cookie é `httpOnly`, o navegador o anexa automaticamente nas requisições
+ao Next, mas o JavaScript da página não consegue **ler** seu valor (`document.cookie`
+não o expõe). Um eventual XSS, portanto, não consegue exfiltrar o token — embora
+o cookie continue sendo enviado pelo navegador nas requisições same-origin.
 
-**Ressalva (modo Supabase, mesmo device):** o `supabase-js` roda no browser e
-manipula o access_token por um instante antes de ele ser enviado uma única vez a
-`/api/auth/session` (que o guarda no cookie httpOnly). No **modo Backend Python**
-(recomendado) o token de sessão jamais toca o JavaScript.
+No **modo Supabase em mesmo dispositivo**, o `supabase-js` roda no browser e
+manipula o access_token por um instante antes de enviá-lo uma única vez a
+`/api/auth/session` (que o guarda no cookie httpOnly). No modo Backend Python o
+token de sessão não passa pelo JavaScript em nenhum momento.

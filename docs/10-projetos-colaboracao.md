@@ -45,8 +45,8 @@ Dois níveis de colaboração:
    avulsa: atribua alguém e ela passa a ver/editar aquele card no board dela.
 
 > Para ser convidado, o usuário precisa **já ter acessado ao menos uma vez** (ter
-> um registro no banco). Isso é uma decisão de simplicidade: não há convite por
-> email para contas inexistentes.
+> um registro no banco): o compartilhamento é com contas existentes, sem convite
+> por email para contas inexistentes.
 
 ## Permissões por membro (configuráveis pelo dono)
 

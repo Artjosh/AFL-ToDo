@@ -3,6 +3,7 @@
 Um projeto agrupa tarefas e é a unidade de compartilhamento: usuários adicionados
 como membros (ProjectMember) passam a ver e editar as tarefas do projeto.
 """
+
 from datetime import UTC, datetime
 
 from sqlalchemy import (
@@ -62,9 +63,7 @@ class Project(Base):
         String(16), default=RemovedMemberPolicy.REVOKE, nullable=False
     )
     # O dono recebe emails de alerta (criação/mudança de status de tarefa)?
-    owner_receives_alerts: Mapped[bool] = mapped_column(
-        Boolean, default=True, nullable=False
-    )
+    owner_receives_alerts: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     data_criacao: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, nullable=False
     )
@@ -87,9 +86,7 @@ class Project(Base):
 
 class ProjectMember(Base):
     __tablename__ = "project_members"
-    __table_args__ = (
-        UniqueConstraint("project_id", "user_id", name="uq_project_member"),
-    )
+    __table_args__ = (UniqueConstraint("project_id", "user_id", name="uq_project_member"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     project_id: Mapped[int] = mapped_column(

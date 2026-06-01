@@ -1,4 +1,5 @@
 """Schemas Pydantic para autenticação passwordless (magic link + OTP)."""
+
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field

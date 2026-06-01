@@ -14,9 +14,9 @@ Não existe senha nem tela de cadastro. O fluxo é:
      detectar a confirmação, entra sozinha (multi-device).
    - **Digitar o código de 6 dígitos** na própria aba (mesmo dispositivo).
 
-Esse fluxo (magic link + OTP + polling cross-device) é inspirado no projeto de
-referência `gaming-cloud` (Next.js + Supabase), que usa o conceito de "pending
-auth" + verificação de status.
+O fluxo combina magic link + OTP com polling cross-device: a aba que iniciou o
+login consulta o status periodicamente e entra sozinha assim que a confirmação
+acontece em qualquer dispositivo.
 
 ## Modo 1 — Backend Python (magic link próprio)
 
@@ -91,15 +91,14 @@ Ver todas as variáveis em [Configuração e .env](./03-configuracao-env.md).
 
 ## Tour guiado (onboarding)
 
-No primeiro acesso à tela de login, um **tour guiado** estilo stepper (inspirado
-no `ats-example`) aparece automaticamente: cards com "Passo X de Y", botões
-**Voltar/Próximo**, barra de progresso e **spotlight** destacando cada elemento
-(seletor de modo, campo de email, multi-device). Aparece **uma única vez**
+No primeiro acesso à tela de login, um **tour guiado** estilo stepper aparece
+automaticamente: cards com "Passo X de Y", botões **Voltar/Próximo**, barra de
+progresso e **spotlight** destacando cada elemento (seletor de modo, campo de
+email, multi-device). Aparece **uma única vez**
 (persistido em `localStorage`) e pode ser reaberto pelo botão **?** na navbar.
 
-> Os toasts e o tour reaproveitam a lógica de "já mostrado / já clicado /
-> anti-spam" de `lib/toast-state.ts`, inspirada no comportamento de notificações
-> do projeto `ats-example`.
+> Os toasts e o tour usam a lógica de "já mostrado / já clicado / anti-spam" de
+> `lib/toast-state.ts`, persistida em `localStorage`.
 
 ## Testar em outro dispositivo
 

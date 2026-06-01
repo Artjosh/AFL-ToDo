@@ -4,6 +4,7 @@ Não há senha no sistema. Um único modelo atende aos dois modos:
 - Modo local: usuário criado/identificado pelo email ao confirmar o magic link.
 - Modo Supabase: ``supabase_user_id`` preenchido (espelho do usuário da Supabase).
 """
+
 from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, Integer, String

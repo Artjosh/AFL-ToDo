@@ -10,6 +10,7 @@ Uso (a partir de backend/, com a venv ativada):
 
 Requer: pip install -r requirements-dev.txt
 """
+
 import argparse
 import os
 import subprocess

@@ -1,4 +1,5 @@
 """Rotas de projetos (board aninhado) e gestão de membros (compartilhamento)."""
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -95,10 +96,7 @@ def list_projects(
     if not ids:
         return []
     projects = (
-        db.query(Project)
-        .filter(Project.id.in_(ids))
-        .order_by(Project.data_criacao.desc())
-        .all()
+        db.query(Project).filter(Project.id.in_(ids)).order_by(Project.data_criacao.desc()).all()
     )
     return [_project_out(db, p, current_user) for p in projects]
 
@@ -180,6 +178,7 @@ def delete_project(
 
 # ------------------------------------------------------------ membros
 
+
 @router.post("/{project_id}/members", response_model=ProjectOut)
 def add_member(
     project_id: int,
@@ -231,9 +230,7 @@ def update_member_permissions(
         .first()
     )
     if member is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Membro não encontrado."
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membro não encontrado.")
 
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(member, field, value)
@@ -277,18 +274,13 @@ def _apply_removal_policy(db: Session, project: Project, user_id: int) -> None:
         return
 
     # Transfere a autoria das tarefas do membro (neste projeto) para o dono.
-    tasks = (
-        db.query(Task)
-        .filter(Task.project_id == project.id, Task.user_id == user_id)
-        .all()
-    )
+    tasks = db.query(Task).filter(Task.project_id == project.id, Task.user_id == user_id).all()
     for t in tasks:
         t.user_id = project.owner_id
 
     # Remove atribuições do membro nas tarefas deste projeto.
     project_task_ids = [
-        row[0]
-        for row in db.query(Task.id).filter(Task.project_id == project.id).all()
+        row[0] for row in db.query(Task.id).filter(Task.project_id == project.id).all()
     ]
     if project_task_ids:
         db.query(TaskAssignee).filter(

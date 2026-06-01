@@ -3,6 +3,7 @@
 Carrega a URL do banco a partir das configurações da aplicação (app.core.config)
 e o metadata da Base para suportar autogenerate.
 """
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool

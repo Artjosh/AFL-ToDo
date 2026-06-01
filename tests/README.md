@@ -40,10 +40,14 @@ O backend usa **ruff** (lint + formatter) configurado em `backend/pyproject.toml
 
 ```bash
 cd backend
-ruff check .         # lint (roda no CI)
-ruff check . --fix   # corrige o que for seguro
-ruff format .        # formata (opcional)
+ruff check .          # lint (roda no CI)
+ruff check . --fix    # corrige o que for seguro
+ruff format .         # formata o código (PEP8)
+ruff format --check . # verifica a formatação (roda no CI)
 ```
+
+> O CI executa `ruff check` e `ruff format --check`: o build falha se o código
+> não estiver lintado e formatado.
 
 ## 2. Frontend (vitest)
 

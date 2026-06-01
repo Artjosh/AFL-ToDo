@@ -4,6 +4,7 @@ Carrega variáveis de ambiente usando pydantic-settings. Todas as configuraçõe
 sensíveis (segredos, URLs, SMTP) vêm de variáveis de ambiente / arquivo .env e
 nunca devem ser comitadas.
 """
+
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict

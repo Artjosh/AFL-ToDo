@@ -8,6 +8,7 @@ internamente. Issuer e audience são validados quando configurados.
 > A "JWKS" é justamente a publicação pública dessas chaves. O backend não precisa
 > de nenhum segredo — valida com a chave pública.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -107,9 +108,7 @@ def verify_email_otp_hash(token_hash: str, otp_type: str = "email") -> dict[str,
         raise SupabaseAuthError(f"Falha ao verificar token na Supabase: {exc}") from exc
 
     if response.status_code != 200:
-        raise SupabaseAuthError(
-            f"Supabase recusou o token_hash (HTTP {response.status_code})."
-        )
+        raise SupabaseAuthError(f"Supabase recusou o token_hash (HTTP {response.status_code}).")
 
     data = response.json()
     if not data.get("access_token"):

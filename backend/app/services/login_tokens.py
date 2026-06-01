@@ -10,6 +10,7 @@ consultados em polling a cada poucos segundos). Por isso:
 Ambas as implementações expõem a mesma interface, então as rotas não precisam
 saber onde os dados moram.
 """
+
 from __future__ import annotations
 
 import json
@@ -51,6 +52,7 @@ def _new_codes(provider: str) -> tuple[str, str | None, str | None]:
 
 
 # ---------------------------------------------------------------- interface
+
 
 class LoginTokenStore:
     """Interface comum. Use get_login_store() para obter a implementação ativa."""
@@ -184,6 +186,7 @@ class RedisLoginTokenStore(LoginTokenStore):
 
 
 # ---------------------------------------------------------------- DB impl
+
 
 class DbLoginTokenStore(LoginTokenStore):
     """Fallback: tokens na tabela login_tokens (SQLite)."""

@@ -5,6 +5,7 @@ As tabelas são criadas via Alembic (ver README). Como conveniência em ambiente
 de desenvolvimento, também garantimos a criação das tabelas no startup caso o
 banco ainda esteja vazio.
 """
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI

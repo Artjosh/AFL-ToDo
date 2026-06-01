@@ -10,6 +10,7 @@ Ela aceita os dois modos de autenticação a partir do header Authorization:
 O backend NUNCA confia em um user_id vindo do corpo/query do frontend — o dono
 da requisição é sempre derivado do token validado aqui.
 """
+
 from __future__ import annotations
 
 from fastapi import Depends, Header, HTTPException, status
@@ -63,11 +64,7 @@ def _get_or_create_user_from_supabase(token: str, db: Session) -> User | None:
     if not supabase_user_id:
         return None
 
-    user = (
-        db.query(User)
-        .filter(User.supabase_user_id == str(supabase_user_id))
-        .first()
-    )
+    user = db.query(User).filter(User.supabase_user_id == str(supabase_user_id)).first()
 
     if user is None and email:
         # Vincula a um usuário local pré-existente com o mesmo email, se houver.

@@ -3,6 +3,7 @@
 Acesso por membership (ver app/api/access.py): criador, atribuídos e membros do
 projeto. O criador é sempre o usuário do token, nunca um id do frontend.
 """
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -239,6 +240,7 @@ def delete_task(
 
 
 # ------------------------------------------------------------ atribuídos
+
 
 @router.post("/{task_id}/assignees", response_model=TaskOut)
 def add_assignee(

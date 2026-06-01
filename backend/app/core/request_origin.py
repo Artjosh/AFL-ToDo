@@ -3,6 +3,7 @@
 Inspirado no request-origin.ts do projeto gaming-cloud: usa BACKEND_PUBLIC_URL
 quando definido; caso contrário, deriva do header Host (respeitando proxies).
 """
+
 from __future__ import annotations
 
 from fastapi import Request

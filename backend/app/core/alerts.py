@@ -10,6 +10,7 @@ O envio reusa o transporte SMTP de ``app.core.email`` (Brevo). Sem SMTP
 configurado (modo dev), não envia nada — apenas é um no-op silencioso. O envio é
 "fire-and-forget" e nunca derruba a request que originou a mudança.
 """
+
 from __future__ import annotations
 
 import threading
@@ -123,7 +124,7 @@ def notify_task_event(
 
     text = (
         f"{settings.APP_NAME}\n\n"
-        f"{actor.email} {acao} \"{task.titulo}\" no projeto \"{project.nome}\".\n"
+        f'{actor.email} {acao} "{task.titulo}" no projeto "{project.nome}".\n'
         f"{detalhe_txt}\n\n"
         "Você recebe este alerta porque está configurado como destinatário de "
         "notificações deste projeto."

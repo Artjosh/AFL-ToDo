@@ -8,6 +8,7 @@
 O acesso (ver/editar) é por membership, não só ownership: criador, atribuídos e
 membros do projeto têm acesso. A regra é aplicada nas rotas.
 """
+
 from datetime import UTC, datetime
 
 from sqlalchemy import (
@@ -51,9 +52,7 @@ class Task(Base):
     )
     titulo: Mapped[str] = mapped_column(String(255), nullable=False)
     descricao: Mapped[str | None] = mapped_column(Text, nullable=True)
-    status: Mapped[str] = mapped_column(
-        String(32), default=TaskStatus.PENDENTE, nullable=False
-    )
+    status: Mapped[str] = mapped_column(String(32), default=TaskStatus.PENDENTE, nullable=False)
     # Ordenação dentro da coluna (board estilo Kanban).
     position: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     data_criacao: Mapped[datetime] = mapped_column(
@@ -78,9 +77,7 @@ class Task(Base):
 
 class TaskAssignee(Base):
     __tablename__ = "task_assignees"
-    __table_args__ = (
-        UniqueConstraint("task_id", "user_id", name="uq_task_assignee"),
-    )
+    __table_args__ = (UniqueConstraint("task_id", "user_id", name="uq_task_assignee"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     task_id: Mapped[int] = mapped_column(

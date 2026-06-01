@@ -29,6 +29,9 @@ jobs:
       - name: Lint (ruff — PEP8)
         run: ruff check .
 
+      - name: Formatação (ruff format)
+        run: ruff format --check .
+
       - name: Testes (pytest)
         working-directory: tests/backend
         run: python -m pytest -q

@@ -7,6 +7,7 @@ são devolvidos na resposta da API, para testes locais (inclusive cross-device).
 O template é inspirado no email do projeto "Planilha Versionada": oferece as duas
 opções — digitar o código de 6 dígitos OU clicar no botão para aprovar o login.
 """
+
 from __future__ import annotations
 
 import smtplib

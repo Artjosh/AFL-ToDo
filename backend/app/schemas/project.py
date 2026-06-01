@@ -1,4 +1,5 @@
 """Schemas Pydantic para projetos e membros."""
+
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
@@ -50,9 +51,7 @@ class ProjectUpdate(BaseModel):
     @classmethod
     def _vpolicy(cls, v: str | None) -> str | None:
         if v is not None and v not in RemovedMemberPolicy.ALL:
-            raise ValueError(
-                f"política inválida. Use um de: {', '.join(RemovedMemberPolicy.ALL)}"
-            )
+            raise ValueError(f"política inválida. Use um de: {', '.join(RemovedMemberPolicy.ALL)}")
         return v
 
 

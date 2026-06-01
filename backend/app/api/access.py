@@ -9,6 +9,7 @@ e passou a ser membership:
 
 Nunca confiamos em ids vindos do frontend — o usuário vem sempre do token.
 """
+
 from __future__ import annotations
 
 from fastapi import HTTPException, status
@@ -19,15 +20,12 @@ from app.models.project import Project, ProjectMember
 from app.models.task import Task, TaskAssignee
 from app.models.user import User
 
-_NOT_FOUND = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND, detail="Não encontrado."
-)
-_FORBIDDEN = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN, detail="Sem permissão."
-)
+_NOT_FOUND = HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Não encontrado.")
+_FORBIDDEN = HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Sem permissão.")
 
 
 # ---------------------------------------------------------------- projetos
+
 
 def user_project_ids(db: Session, user: User) -> list[int]:
     """IDs de projetos que o usuário possui ou é membro."""
@@ -77,6 +75,7 @@ def ensure_project_owner(db: Session, project: Project, user: User) -> None:
 
 # ---------------------------------------------------------------- permissões por membro
 
+
 def can_move_project(db: Session, project: Project, user: User) -> bool:
     """Quem pode mover o PRÓPRIO PROJETO entre status: dono, ou membro autorizado."""
     if project.owner_id == user.id:
@@ -121,6 +120,7 @@ def ensure_can(condition: bool) -> None:
 
 # ---------------------------------------------------------------- tarefas
 
+
 def task_is_accessible(db: Session, task: Task, user: User) -> bool:
     if task.user_id == user.id:
         return True
@@ -152,9 +152,7 @@ def accessible_tasks_query(db: Session, user: User):
     project_ids = user_project_ids(db, user)
     assigned_task_ids = [
         row[0]
-        for row in db.query(TaskAssignee.task_id)
-        .filter(TaskAssignee.user_id == user.id)
-        .all()
+        for row in db.query(TaskAssignee.task_id).filter(TaskAssignee.user_id == user.id).all()
     ]
 
     conditions = [Task.user_id == user.id]

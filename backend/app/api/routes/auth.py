@@ -19,6 +19,7 @@ Os pedidos de login (efêmeros) ficam no Redis quando disponível (com TTL), tir
 o tráfego do polling do banco real; sem Redis, caem na tabela login_tokens (ver
 app/services/login_tokens.py). Não existe cadastro separado: o primeiro acesso cria a conta.
 """
+
 import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -243,9 +244,7 @@ def login_status(selector: str, db: Session = Depends(get_db)) -> LoginStatusRes
         )
 
     if req.status != LoginTokenStatus.APPROVED:
-        return LoginStatusResponse(
-            status="pending", authenticated=False, provider=req.provider
-        )
+        return LoginStatusResponse(status="pending", authenticated=False, provider=req.provider)
 
     user = _get_or_create_user_by_email(db, req.email)
 

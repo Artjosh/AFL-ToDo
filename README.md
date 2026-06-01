@@ -8,44 +8,24 @@ drag-and-drop, projetos aninhados e compartilhamento entre usuários), com
 como fonte de verdade das tarefas e **frontend Next.js (TypeScript + TailwindCSS)**
 atuando como **BFF** (o token de sessão vive em cookie httpOnly, nunca no browser).
 
-## Aderência ao desafio (e onde fomos além)
+## Funcionalidades
 
-O desafio pedia: API + frontend de to-do com **CRUD de tarefas** (`id, titulo,
-descricao, status, data_criacao`), **autenticação JWT (cadastro e login)**, **cada
-usuário só vê suas tarefas**, **persistência em SQLite** e **README detalhado**.
-Tudo isso está entregue:
-
-- **CRUD completo** de tarefas com todos os campos exigidos. ✅
-- **JWT + cadastro + login**: o login é **passwordless** (magic link + código OTP).
-  O **cadastro continua existindo** — ele acontece de forma integrada **no primeiro
-  acesso** (ao confirmar o link/código, a conta é criada automaticamente). E o
-  **JWT continua sendo o mecanismo de sessão** (emitido pelo backend após a
-  confirmação). Ou seja: cadastro, login e JWT estão presentes — apenas sem senha,
-  o que **elimina uma classe inteira de riscos** (vazamento/reuso de senhas,
-  brute force). É uma melhoria de segurança, não uma ausência de requisito. ✅
-- **Isolamento por usuário** validado no backend a cada requisição. ✅
-- **SQLite** como persistência. ✅
-- **README + documentação** detalhada (abaixo). ✅
-
-**Implementações complementares (além do mínimo):** board Kanban com
-drag-and-drop, **projetos** com board aninhado, **compartilhamento** com
-**permissões por membro** (mover projeto, mover/gerenciar tarefas), **política de
-remoção** de membro, **alertas por email** de eventos de tarefa, **realtime**
-(WebSocket + Redis Pub/Sub), **multi-dispositivo** (clicar o link em outro
-aparelho), **modo Supabase Auth** opcional, **padrão BFF** (cookie httpOnly +
-proxy + ticket de WebSocket) e **104 testes de backend + 21 de frontend + 16 E2E**.
-
-Destaques:
+- **CRUD de tarefas** com os campos `id`, `titulo`, `descricao`, `status` e `data_criacao`.
+- **Autenticação sem senha** (magic link + código OTP) com sessão **JWT**. O
+  cadastro acontece no primeiro acesso: ao confirmar o link ou o código, a conta é criada.
+- **Isolamento por usuário**: cada um acessa apenas as tarefas a que tem acesso,
+  validado no backend a cada requisição.
 - **Board Kanban** (Pendente / Em andamento / Concluída) com arrastar-e-soltar.
-- **Projetos**: agrupam tarefas; aparecem como card na lista e expandem num board próprio, com **status** próprio.
-- **Compartilhamento + permissões por membro**: defina quem pode mover o projeto,
+- **Projetos** que agrupam tarefas, aparecem como card na lista, expandem num
+  board próprio e têm **status** próprio (também arrastável entre colunas).
+- **Compartilhamento com permissões por membro**: quem pode mover o projeto,
   mover/criar/editar/excluir tarefas e quem recebe **alertas por email**.
-- **Política de remoção** de membro (revogar acesso ou manter como dono das tarefas).
-- **Login sem senha** multi-dispositivo (link + código de 6 dígitos), com dois
-  modos: Backend Python ou Python + Supabase Auth.
+- **Política de remoção** de membro: revogar acesso ou manter como dono das tarefas.
+- **Multi-dispositivo**: peça o link no PC e confirme no celular.
 - **Realtime** (opcional, via Redis): o board atualiza ao vivo quando outro membro mexe.
-- **Padrão BFF**: o token de sessão fica em cookie httpOnly (fora do alcance do JS).
-- Acesso por **membership** (criador, atribuído ou membro do projeto), validado no backend.
+- **Dois modos de autenticação**: Backend Python ou Python + Supabase Auth.
+- **Padrão BFF**: o token de sessão fica em cookie httpOnly, fora do alcance do JavaScript.
+- **Testes automatizados**: 104 de backend, 21 de frontend e 16 E2E, com CI no GitHub Actions.
 
 ## Início rápido
 

@@ -7,6 +7,7 @@ O cliente conecta em /ws/board?token=<jwt>&project_id=<id|omitido>. O backend:
 
 Eventos são publicados pelas rotas de tarefas/projetos via publish_board_event.
 """
+
 from __future__ import annotations
 
 import asyncio

@@ -6,6 +6,7 @@ Se o número de hits ultrapassar o limite, levanta 429.
 Sem Redis configurado, é um no-op (não limita) — adequado para dev/testes, onde
 o foco não é proteção contra abuso.
 """
+
 from __future__ import annotations
 
 from fastapi import HTTPException, status

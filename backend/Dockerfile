@@ -13,10 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Código
 COPY . .
 
-# O banco SQLite fica em /data (montado como volume persistente).
-ENV DATABASE_URL=sqlite:////data/app.db
-
+# Porta: usa a injetada pelo ambiente (Railway/Render definem $PORT); 8000 local.
+ENV PORT=8000
 EXPOSE 8000
 
-# Aplica migrations e sobe o servidor (2 workers como exemplo).
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"]
+# Aplica migrations e sobe o servidor escutando na porta do ambiente ($PORT).
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 2"]

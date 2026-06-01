@@ -6,6 +6,7 @@ de login vão para o banco; rate limit e realtime são desativados).
 
 Assim o backend funciona com ou sem Redis, sem ramificações espalhadas pelo código.
 """
+
 from __future__ import annotations
 
 import redis

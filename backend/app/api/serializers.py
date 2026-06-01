@@ -1,4 +1,5 @@
 """Serialização de modelos para os schemas de saída (com relações)."""
+
 from __future__ import annotations
 
 from app.models.task import Task

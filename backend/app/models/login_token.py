@@ -15,6 +15,7 @@ Esse fluxo replica o conceito do projeto gaming-cloud (pending-auth +
 check-login-status), permitindo clicar o link em um device diferente do que
 iniciou o login.
 """
+
 from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, Integer, String, Text
@@ -44,9 +45,7 @@ class LoginToken(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     # Identificador público do pedido de login (usado no polling).
-    selector: Mapped[str] = mapped_column(
-        String(64), unique=True, index=True, nullable=False
-    )
+    selector: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
     # Segredo enviado no link do email (modo local).
     magic_token: Mapped[str | None] = mapped_column(
         String(128), unique=True, index=True, nullable=True
@@ -70,9 +69,7 @@ class LoginToken(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, nullable=False
     )
-    expires_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     def is_expired(self) -> bool:
         expires = self.expires_at

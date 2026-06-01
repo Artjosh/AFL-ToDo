@@ -1,4 +1,5 @@
 """Schemas Pydantic para tarefas, atribuídos e usuários resumidos."""
+
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator

@@ -3,6 +3,7 @@
 Usa SQLite por padrão. ``check_same_thread=False`` é necessário porque o FastAPI
 pode usar a conexão em threads diferentes durante o ciclo de requisições.
 """
+
 from collections.abc import Generator
 
 from sqlalchemy import create_engine

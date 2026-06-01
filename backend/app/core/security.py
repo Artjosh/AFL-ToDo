@@ -7,6 +7,7 @@ Não há senha no sistema. O login é por magic link / OTP:
 Usa PyJWT (biblioteca mantida e sem o DeprecationWarning de datetime do python-jose).
 A validação do token Supabase fica em app/core/supabase_auth.py.
 """
+
 from datetime import UTC, datetime, timedelta
 from typing import Any
 

@@ -9,6 +9,7 @@ via WebSocket naquele tópico recebem o evento e atualizam o board ao vivo.
 - Sem Redis: usa um broadcaster em memória (funciona só dentro do mesmo processo),
   suficiente para dev/single-instance.
 """
+
 from __future__ import annotations
 
 import asyncio
