@@ -51,6 +51,12 @@ class Settings(BaseSettings):
     SMTP_FROM_NAME: str = "ToDo AFL"
     SMTP_USE_TLS: bool = True
 
+    # --- Brevo via API HTTP (porta 443) ---
+    # Em hospedagens que bloqueiam SMTP de saída (ex.: Railway), use a API HTTP
+    # do Brevo. Se BREVO_API_KEY estiver definida, o envio vai por HTTP em vez de
+    # SMTP. Pegue em: Brevo -> SMTP & API -> API Keys.
+    BREVO_API_KEY: str = ""
+
     # --- Supabase (modo "Python Backend + Supabase Auth") ---
     # Usa chaves assimétricas (ES256/RS256) validadas pelo JWKS público do projeto.
     SUPABASE_URL: str = ""
@@ -90,13 +96,13 @@ class Settings(BaseSettings):
 
         Regra de segurança (falha fechada):
         - Em PRODUÇÃO: NUNCA expõe, independentemente de qualquer flag. O acesso
-          é só pelo email enviado por SMTP.
+          é só pelo email.
         - Fora de produção: expõe se SHOW_DEV_LOGIN_CODES estiver ligada OU se não
-          houver SMTP (modo dev puro, onde a tela é o único jeito de logar).
+          houver canal de email (modo dev puro, onde a tela é o único jeito de logar).
         """
         if self.is_production:
             return False
-        return self.SHOW_DEV_LOGIN_CODES or not self.smtp_enabled
+        return self.SHOW_DEV_LOGIN_CODES or not self.email_enabled
 
     @property
     def supabase_enabled(self) -> bool:
@@ -117,6 +123,16 @@ class Settings(BaseSettings):
     def smtp_enabled(self) -> bool:
         """Indica se há SMTP configurado para envio real de email."""
         return bool(self.SMTP_HOST and self.SMTP_USER and self.SMTP_PASSWORD)
+
+    @property
+    def brevo_api_enabled(self) -> bool:
+        """Indica se o envio via API HTTP do Brevo está configurado."""
+        return bool(self.BREVO_API_KEY and (self.SMTP_FROM or self.SMTP_USER))
+
+    @property
+    def email_enabled(self) -> bool:
+        """Há algum canal de email disponível (API Brevo ou SMTP)."""
+        return self.brevo_api_enabled or self.smtp_enabled
 
     @property
     def cors_origins(self) -> list[str]:

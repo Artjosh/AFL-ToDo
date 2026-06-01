@@ -65,3 +65,17 @@ docker compose up --build
   ou via arquivo `.env` antes de subir em um ambiente real.
 - Para escalar o backend em múltiplas réplicas, o Redis garante o fan-out do
   realtime entre elas (ver [Redis: tokens, rate limit e realtime](./05-redis-realtime.md)).
+
+## Email em produção (atenção a SMTP bloqueado)
+
+Algumas hospedagens (ex.: **Railway**) **bloqueiam conexões SMTP de saída**
+(portas 25/465/587) por padrão. Nesses casos o envio por SMTP falha com timeout.
+
+Solução: use a **API HTTP do Brevo**, que vai por `https` (porta 443) e não é
+bloqueada. Defina `BREVO_API_KEY` (Brevo → SMTP & API → API Keys) e um
+`SMTP_FROM` verificado; quando a API key existe, o backend a usa no lugar do SMTP
+automaticamente. Em desenvolvimento local, o SMTP normal continua funcionando.
+
+> Falhas de envio de email não derrubam o login: o pedido é criado mesmo assim e
+> a resposta indica `email_sent: false`. Em produção, os códigos nunca voltam no
+> corpo (falha fechada) — então um canal de email funcionando é obrigatório.

@@ -84,23 +84,35 @@ def request_magic_link(
     origin = get_backend_origin(request)
     magic_url = f"{origin}/auth/confirm?token={req.magic_token}"
 
-    send_login_email(email, magic_url, req.otp_code or "")
+    # Tenta enviar o email. Uma falha de envio não deve derrubar o request: o
+    # pedido de login já foi criado e o usuário pode tentar de novo. Em modo dev,
+    # os códigos ainda voltam no corpo (expose_login_codes).
+    email_sent = False
+    if settings.email_enabled:
+        try:
+            send_login_email(email, magic_url, req.otp_code or "")
+            email_sent = True
+        except Exception:
+            email_sent = False
 
     # Devolve link + código na resposta apenas quando permitido. Em produção,
     # expose_login_codes é SEMPRE False (falha fechada) — nada de segredo no corpo.
     expose_codes = settings.expose_login_codes
 
+    if email_sent:
+        message = "Enviamos um link e um código de acesso para o seu email."
+    elif expose_codes:
+        message = "Use o link ou o código abaixo para entrar."
+    else:
+        message = "Não foi possível enviar o email agora. Tente novamente em instantes."
+
     return MagicLinkResponse(
         selector=req.selector,
         email=email,
-        email_sent=settings.smtp_enabled,
+        email_sent=email_sent,
         dev_magic_url=magic_url if expose_codes else None,
         dev_otp_code=req.otp_code if expose_codes else None,
-        message=(
-            "Enviamos um link e um código de acesso para o seu email."
-            if settings.smtp_enabled
-            else "SMTP não configurado (modo dev): use o link ou o código retornado."
-        ),
+        message=message,
     )
 
 

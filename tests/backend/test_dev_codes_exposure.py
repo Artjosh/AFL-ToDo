@@ -87,3 +87,38 @@ def test_request_nao_pode_forcar_exposicao(client, monkeypatch):
     body = r.json()
     assert body["dev_otp_code"] is None
     assert body["dev_magic_url"] is None
+
+
+def test_falha_no_envio_nao_derruba_request(client, monkeypatch):
+    """Se o envio de email falhar, o endpoint responde 200 (email_sent=False),
+    não 500. O pedido de login foi criado e pode ser reusado."""
+    monkeypatch.setattr(auth_routes.settings, "SMTP_HOST", "smtp-relay.brevo.com")
+    monkeypatch.setattr(auth_routes.settings, "SMTP_USER", "u")
+    monkeypatch.setattr(auth_routes.settings, "SMTP_PASSWORD", "p")
+    monkeypatch.setattr(auth_routes.settings, "ENVIRONMENT", "production")
+
+    def boom(*a, **k):
+        raise TimeoutError("smtp blocked")
+
+    monkeypatch.setattr(auth_routes, "send_login_email", boom)
+
+    r = client.post("/auth/magic-link", json={"email": "x@test.com"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["email_sent"] is False
+    assert body["selector"]
+    # em produção, mesmo com falha, não expõe os códigos
+    assert body["dev_otp_code"] is None
+
+
+def test_brevo_api_enabled_quando_ha_api_key(monkeypatch):
+    """email_enabled cobre o canal Brevo API mesmo sem SMTP_USER/PASSWORD."""
+    from app.core.config import settings as cfg
+
+    monkeypatch.setattr(cfg, "SMTP_USER", "")
+    monkeypatch.setattr(cfg, "SMTP_PASSWORD", "")
+    monkeypatch.setattr(cfg, "BREVO_API_KEY", "xkeysib-abc")
+    monkeypatch.setattr(cfg, "SMTP_FROM", "remetente@dominio.com")
+    assert cfg.brevo_api_enabled is True
+    assert cfg.email_enabled is True
+    assert cfg.smtp_enabled is False

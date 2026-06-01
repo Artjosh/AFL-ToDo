@@ -25,10 +25,10 @@ async def lifespan(app: FastAPI):
 
     # Guarda de segurança: em produção, exigir configuração segura.
     if settings.is_production:
-        if not settings.smtp_enabled:
+        if not settings.email_enabled:
             raise RuntimeError(
-                "Produção sem SMTP: o login passwordless exige envio de email. "
-                "Configure SMTP_* ou ajuste ENVIRONMENT."
+                "Produção sem email: o login passwordless exige um canal de envio. "
+                "Configure BREVO_API_KEY (recomendado em cloud) ou SMTP_*."
             )
         if settings.JWT_SECRET in ("", "change-me"):
             raise RuntimeError(

@@ -1,11 +1,16 @@
-"""Envio de email do login passwordless (magic link + código OTP).
+"""Envio de email do login passwordless (magic link + código OTP) e alertas.
 
-Usa SMTP (defaults preparados para o Brevo). Se o SMTP não estiver configurado
-(SMTP_HOST/USER/PASSWORD), opera em "modo dev": não envia nada e o link + código
-são devolvidos na resposta da API, para testes locais (inclusive cross-device).
+Dois canais de envio, escolhidos automaticamente:
 
-O template é inspirado no email do projeto "Planilha Versionada": oferece as duas
-opções — digitar o código de 6 dígitos OU clicar no botão para aprovar o login.
+1. **API HTTP do Brevo** (porta 443) — usada quando `BREVO_API_KEY` está definida.
+   Funciona em hospedagens que bloqueiam SMTP de saída (ex.: Railway).
+2. **SMTP** (Brevo) — usado quando há `SMTP_USER`/`SMTP_PASSWORD` e não há API key.
+   Ideal para rodar local.
+
+Sem nenhum canal configurado, o backend opera em "modo dev": não envia email e o
+link + código são devolvidos na resposta da API (ver `expose_login_codes`).
+
+O template oferece as duas vias: digitar o código de 6 dígitos OU clicar no botão.
 """
 
 from __future__ import annotations
@@ -14,6 +19,8 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from email.utils import formataddr
+
+import httpx
 
 from app.core.config import settings
 
@@ -61,29 +68,60 @@ def _build_text(magic_url: str, otp_code: str) -> str:
 
 
 def send_login_email(to_email: str, magic_url: str, otp_code: str) -> None:
-    """Envia o email com magic link + código OTP. No modo dev não faz nada."""
-    if not settings.smtp_enabled:
+    """Envia o email com magic link + código OTP. No modo dev (sem canal) não faz nada."""
+    if not settings.email_enabled:
         return
-
-    message = EmailMessage()
-    message["Subject"] = f"Seu acesso ao {settings.APP_NAME}"
-    from_addr = settings.SMTP_FROM or settings.SMTP_USER
-    message["From"] = formataddr((settings.SMTP_FROM_NAME, from_addr))
-    message["To"] = to_email
-    message.set_content(_build_text(magic_url, otp_code))
-    message.add_alternative(_build_html(magic_url, otp_code), subtype="html")
-
-    _send(message)
+    _deliver(
+        to_email,
+        subject=f"Seu acesso ao {settings.APP_NAME}",
+        html=_build_html(magic_url, otp_code),
+        text=_build_text(magic_url, otp_code),
+    )
 
 
 def send_simple_email(to_email: str, subject: str, html: str, text: str) -> None:
     """Envia um email genérico (HTML + texto). Usado pelos alertas de projeto.
 
-    No modo dev (sem SMTP) é um no-op. Não trata exceções — quem chama decide.
+    No modo dev (sem canal) é um no-op. Não trata exceções — quem chama decide.
     """
-    if not settings.smtp_enabled:
+    if not settings.email_enabled:
         return
+    _deliver(to_email, subject=subject, html=html, text=text)
 
+
+def _deliver(to_email: str, subject: str, html: str, text: str) -> None:
+    """Escolhe o canal: API HTTP do Brevo (porta 443) ou SMTP."""
+    if settings.brevo_api_enabled:
+        _send_via_brevo_api(to_email, subject, html, text)
+    else:
+        _send_via_smtp(to_email, subject, html, text)
+
+
+def _send_via_brevo_api(to_email: str, subject: str, html: str, text: str) -> None:
+    """Envia pela API transacional do Brevo (HTTPS, não bloqueada em cloud)."""
+    from_email = settings.SMTP_FROM or settings.SMTP_USER
+    payload = {
+        "sender": {"email": from_email, "name": settings.SMTP_FROM_NAME},
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "htmlContent": html,
+        "textContent": text,
+    }
+    resp = httpx.post(
+        "https://api.brevo.com/v3/smtp/email",
+        json=payload,
+        headers={
+            "api-key": settings.BREVO_API_KEY,
+            "content-type": "application/json",
+            "accept": "application/json",
+        },
+        timeout=20,
+    )
+    resp.raise_for_status()
+
+
+def _send_via_smtp(to_email: str, subject: str, html: str, text: str) -> None:
+    """Entrega a mensagem via SMTP (com ou sem STARTTLS)."""
     message = EmailMessage()
     message["Subject"] = subject
     from_addr = settings.SMTP_FROM or settings.SMTP_USER
@@ -92,11 +130,6 @@ def send_simple_email(to_email: str, subject: str, html: str, text: str) -> None
     message.set_content(text)
     message.add_alternative(html, subtype="html")
 
-    _send(message)
-
-
-def _send(message: EmailMessage) -> None:
-    """Entrega a mensagem via SMTP (com ou sem STARTTLS)."""
     if settings.SMTP_USE_TLS:
         context = ssl.create_default_context()
         with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=20) as server:
