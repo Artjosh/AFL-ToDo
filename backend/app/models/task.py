@@ -8,7 +8,7 @@
 O acesso (ver/editar) é por membership, não só ownership: criador, atribuídos e
 membros do projeto têm acesso. A regra é aplicada nas rotas.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import (
     DateTime,
@@ -24,7 +24,7 @@ from app.db.base import Base
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class TaskStatus:

@@ -3,21 +3,23 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.access import (
-    can_move_project,
-    can_move_tasks as access_can_move_tasks,
     can_manage_tasks as access_can_manage_tasks,
+)
+from app.api.access import (
+    can_move_project,
     ensure_can,
     ensure_project_owner,
     get_accessible_project,
-    get_membership,
-    is_project_member,
     user_project_ids,
+)
+from app.api.access import (
+    can_move_tasks as access_can_move_tasks,
 )
 from app.api.deps import get_current_user
 from app.api.serializers import task_to_out
 from app.db.session import get_db
 from app.models.project import Project, ProjectMember, ProjectRole, RemovedMemberPolicy
-from app.models.task import Task, TaskAssignee, TaskStatus
+from app.models.task import Task, TaskAssignee
 from app.models.user import User
 from app.schemas.project import (
     MemberAdd,
@@ -28,7 +30,7 @@ from app.schemas.project import (
     ProjectOut,
     ProjectUpdate,
 )
-from app.services.realtime import notify_board, topic_for_project, topic_for_standalone
+from app.services.realtime import notify_board, topic_for_standalone
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -144,8 +146,6 @@ def update_project(
 ) -> ProjectOut:
     project = get_accessible_project(db, project_id, current_user)
     data = payload.model_dump(exclude_unset=True)
-
-    is_owner = project.owner_id == current_user.id
 
     # Mudar o STATUS do projeto: dono ou membro com can_move_project.
     if "status" in data:
@@ -286,7 +286,10 @@ def _apply_removal_policy(db: Session, project: Project, user_id: int) -> None:
         t.user_id = project.owner_id
 
     # Remove atribuições do membro nas tarefas deste projeto.
-    project_task_ids = [row[0] for row in db.query(Task.id).filter(Task.project_id == project.id).all()]
+    project_task_ids = [
+        row[0]
+        for row in db.query(Task.id).filter(Task.project_id == project.id).all()
+    ]
     if project_task_ids:
         db.query(TaskAssignee).filter(
             TaskAssignee.user_id == user_id,

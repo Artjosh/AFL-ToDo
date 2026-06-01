@@ -15,7 +15,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from app.models.project import Project, ProjectMember, ProjectRole
+from app.models.project import Project, ProjectMember
 from app.models.task import Task, TaskAssignee
 from app.models.user import User
 

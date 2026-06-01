@@ -7,7 +7,7 @@ Não há senha no sistema. O login é por magic link / OTP:
 Usa PyJWT (biblioteca mantida e sem o DeprecationWarning de datetime do python-jose).
 A validação do token Supabase fica em app/core/supabase_auth.py.
 """
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import jwt
@@ -22,7 +22,7 @@ def create_access_token(subject: str | int, expires_minutes: int | None = None) 
     O ``subject`` (sub) é o id do usuário local.
     """
     expire_minutes = expires_minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     to_encode: dict[str, Any] = {
         "sub": str(subject),
         "exp": now + timedelta(minutes=expire_minutes),
@@ -55,7 +55,7 @@ def create_ws_ticket(subject: str | int, expires_seconds: int = 60) -> str:
     o frontend pede ao BFF um ticket de curtíssima duração e o usa uma vez na URL
     de conexão. Mesmo se vazar, expira em segundos e só serve para abrir o WS.
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     to_encode: dict[str, Any] = {
         "sub": str(subject),
         "exp": now + timedelta(seconds=expires_seconds),

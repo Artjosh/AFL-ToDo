@@ -24,7 +24,7 @@ vínculo de contas por email entre os modos. (104 testes)
 ```bash
 cd backend
 .\.venv\Scripts\Activate.ps1            # Windows (ou: source .venv/bin/activate)
-pip install -r requirements-dev.txt     # instala pytest (uma vez)
+pip install -r requirements-dev.txt     # instala pytest + ruff (uma vez)
 cd ../tests/backend
 python -m pytest                        # roda os testes
 python -m pytest --cov=app --cov-report=term-missing   # com cobertura
@@ -32,6 +32,18 @@ python -m pytest --cov=app --cov-report=term-missing   # com cobertura
 
 > Cada teste usa um SQLite isolado (tmp). A verificação de assinatura do token
 > Supabase é mockada (não depende de rede).
+
+### Lint / PEP8 (ruff)
+
+O backend usa **ruff** (lint + formatter) configurado em `backend/pyproject.toml`
+(regras pycodestyle/PEP8, pyflakes, isort, pyupgrade, bugbear).
+
+```bash
+cd backend
+ruff check .         # lint (roda no CI)
+ruff check . --fix   # corrige o que for seguro
+ruff format .        # formata (opcional)
+```
 
 ## 2. Frontend (vitest)
 

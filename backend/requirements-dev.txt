@@ -5,6 +5,7 @@
 pytest==8.3.4
 pytest-cov==6.0.0
 fakeredis==2.26.1
+ruff==0.9.2
 
 # Painel web para inspecionar o banco SQLite em dev (ferramenta, não usada em prod).
 sqlite-web==0.6.4

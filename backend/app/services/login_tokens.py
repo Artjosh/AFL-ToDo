@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import secrets
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.orm import Session
 
@@ -192,7 +192,7 @@ class DbLoginTokenStore(LoginTokenStore):
         self.db = db
 
     def _expiry(self) -> datetime:
-        return datetime.now(timezone.utc) + timedelta(minutes=settings.MAGIC_LINK_EXPIRE_MINUTES)
+        return datetime.now(UTC) + timedelta(minutes=settings.MAGIC_LINK_EXPIRE_MINUTES)
 
     @staticmethod
     def _to_req(row: LoginToken) -> LoginRequest:

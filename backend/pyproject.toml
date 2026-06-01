@@ -1,0 +1,26 @@
+# Configuração do Ruff — linter + formatter (PEP8) do backend.
+# Uso:
+#   ruff check .        # lint
+#   ruff check . --fix  # corrige o que for seguro
+#   ruff format .       # formata (estilo PEP8)
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Não analisar artefatos/venv/migrations geradas.
+extend-exclude = [".venv", "alembic/versions", "__pycache__"]
+
+[tool.ruff.lint]
+# E/W = pycodestyle (PEP8), F = pyflakes, I = isort (imports),
+# UP = pyupgrade, B = bugbear (bugs comuns).
+select = ["E", "W", "F", "I", "UP", "B"]
+ignore = [
+    "B008",  # FastAPI usa Depends()/Query() como default de argumento (padrão do framework)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Imports propositais para registrar models/efeitos colaterais.
+"app/db/base_all.py" = ["F401"]
+"app/api/routes/ws.py" = ["F401"]
+# Templates HTML inline (estilos longos) — quebrar a linha mudaria o email renderizado.
+"app/core/email.py" = ["E501"]
+"app/core/alerts.py" = ["E501"]

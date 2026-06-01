@@ -15,7 +15,7 @@ Esse fluxo replica o conceito do projeto gaming-cloud (pending-auth +
 check-login-status), permitindo clicar o link em um device diferente do que
 iniciou o login.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -24,7 +24,7 @@ from app.db.base import Base
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class LoginTokenStatus:
@@ -77,5 +77,5 @@ class LoginToken(Base):
     def is_expired(self) -> bool:
         expires = self.expires_at
         if expires.tzinfo is None:
-            expires = expires.replace(tzinfo=timezone.utc)
-        return datetime.now(timezone.utc) > expires
+            expires = expires.replace(tzinfo=UTC)
+        return datetime.now(UTC) > expires

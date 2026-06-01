@@ -3,7 +3,7 @@
 Um projeto agrupa tarefas e é a unidade de compartilhamento: usuários adicionados
 como membros (ProjectMember) passam a ver e editar as tarefas do projeto.
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import (
     Boolean,
@@ -20,7 +20,7 @@ from app.db.base import Base
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class ProjectRole:

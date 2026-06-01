@@ -4,7 +4,7 @@ Não há senha no sistema. Um único modelo atende aos dois modos:
 - Modo local: usuário criado/identificado pelo email ao confirmar o magic link.
 - Modo Supabase: ``supabase_user_id`` preenchido (espelho do usuário da Supabase).
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -13,7 +13,7 @@ from app.db.base import Base
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class User(Base):
