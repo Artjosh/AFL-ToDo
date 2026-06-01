@@ -17,10 +17,11 @@ URLs para o **IP da sua máquina** (não `localhost`).
   tudo apontar para o IP da máquina, funciona **100% na rede local**, sem nada
   externo.
 - **Python + Supabase Auth:** o link é gerado pela **Supabase (nuvem)** e
-  redireciona para o `emailRedirectTo`. Em rede local isso é problemático porque o
-  IP `192.168.x.x` não é roteável de fora e muda por máquina. Para multi-device
-  real no modo Supabase, use uma **URL pública** (deploy ou túnel `ngrok`/
-  `cloudflared`) — ver [Configurar a Supabase](./04-configurar-supabase.md).
+  redireciona para o callback do backend. Em **rede local** o IP `192.168.x.x`
+  serve para testes na mesma rede (cadastre-o nas Redirect URLs como
+  `http://<ip>:8000/**`). Para multi-device **fora da rede** (produção), use os
+  domínios públicos — ver [Configurar a Supabase](./04-configurar-supabase.md),
+  seção "Multi-device no modo Supabase (produção)".
 
 ## Passo a passo (modo Backend Python)
 

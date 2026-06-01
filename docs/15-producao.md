@@ -31,7 +31,12 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
 - `JWT_SECRET` forte e único (ex.: `openssl rand -hex 32`).
 - **SMTP** configurado (Brevo) para envio real dos emails de acesso.
 - `FRONTEND_URL` e `BACKEND_PUBLIC_URL` com os domínios reais.
-- Redirect URLs e template de email atualizados no painel da Supabase.
+- **Modo Supabase:** na Supabase, **Site URL** = domínio do frontend e **Redirect
+  URLs** = `https://<backend-publico>/**` (o `/**` é obrigatório por causa da query
+  `?selector=...`); o template de email usa `&token_hash` (não `?`). Na Vercel,
+  `NEXT_PUBLIC_API_URL` = backend público e **faça redeploy** após alterar (vars
+  `NEXT_PUBLIC_*` entram no build). Detalhes em
+  [Configurar a Supabase](./04-configurar-supabase.md).
 - Migrations aplicadas com `alembic upgrade head` no deploy.
 - **SQLite**: garanta um volume persistente (ver
   [Decisões técnicas](./14-decisoes-tecnicas.md)); para concorrência alta,

@@ -16,35 +16,34 @@ A `anon key` legada é aceita apenas como fallback.
 ## 2. Site URL e Redirect URLs
 Em *Authentication → URL Configuration*:
 
-**Site URL** (campo único, base do projeto):
+**Site URL** (campo único, base do projeto) — em produção, o domínio do frontend:
 ```
-http://192.168.100.163:3000
-```
-
-**Redirect URLs** (allowlist — adicione todas):
-```
-http://192.168.100.163:8000/auth/supabase/callback
-http://localhost:8000/auth/supabase/callback
-http://192.168.100.163:3000
-http://localhost:3000
+https://afl-to-do.vercel.app/
 ```
 
-Por que cada uma:
-- `.../:8000/auth/supabase/callback` (IP + localhost) — **alvo do link do email** no
-  fluxo cross-device. O frontend monta o `emailRedirectTo` como
-  `NEXT_PUBLIC_API_URL/auth/supabase/callback?selector=...`; como o seu
-  `NEXT_PUBLIC_API_URL` é `http://192.168.100.163:8000`, **a do IP é a essencial**
-  (a de `localhost` cobre o teste na própria máquina).
-- `.../:3000` (IP + localhost) — fallback de mesmo-device: sem pedido de polling, o
-  backend redireciona para `FRONTEND_URL/login?supabase=confirmed`.
+**Redirect URLs** (allowlist) — o callback fica no **backend** (onde o
+`token_hash` é trocado). Use **wildcard `/**`** no fim:
+```
+https://afl-todo-production.up.railway.app/**
+```
 
-> **Troque `192.168.100.163` pelo IP da sua máquina** (e, em produção, pelo domínio
-> real). O IP da rede local **não é alcançável de fora** dela: para multi-device
-> real no modo Supabase, use uma URL pública (deploy ou túnel) — ver
-> [Acesso por outro dispositivo na rede](./08-acesso-rede-multidevice.md). No modo
-> **Backend Python** isso não se aplica.
+> **O `/**` é obrigatório, não opcional.** O frontend monta o `emailRedirectTo`
+> como `<backend>/auth/supabase/callback?selector=XXX`, ou seja, **com query
+> string dinâmica** (`?selector=...`). A Supabase faz match da allowlist tratando
+> `.` e `/` como separadores; uma entrada fixa como
+> `.../auth/supabase/callback` **não casa** com a URL que tem `?selector=...`, e a
+> Supabase descarta o `redirect_to` e cai no **Site URL** (você vê o link ir para
+> a raiz do site, com a URL quebrada). O `https://<backend>/**` casa com o caminho
+> + query e resolve isso. (Doc oficial:
+> [Redirect URLs / wildcards](https://supabase.com/docs/guides/auth/redirect-urls).)
 
-Ajuste para as URLs de produção quando publicar.
+Para **desenvolvimento local / mesma rede**, adicione também as variantes com o
+IP/porta locais (ex.: `http://192.168.100.163:8000/**` e
+`http://localhost:8000/**`).
+
+Site URL e Redirect URLs sempre apontam para os domínios **públicos** em produção
+(Vercel para o front, Railway/Render/Fly para o back). Domínio público com HTTPS,
+sem porta explícita.
 
 ## 3. Template de email (Magic Link) e código OTP
 Em *Authentication → Email Templates → Magic Link*, cole o conteúdo abaixo. O
@@ -83,9 +82,13 @@ backend** levando o `token_hash` (fluxo multi-device):
 
 > Este é o **mesmo template do backend Python** (`app/core/email.py`), adaptado
 > às variáveis da Supabase: o código vira `{{ .Token }}` e o link de aprovação
-> usa `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email`. Assim os dois
-> modos enviam um email visualmente idêntico. O app aceita as duas vias: clicar o
-> link ou digitar o código.
+> usa `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email`.
+>
+> **Atenção ao separador `&` (não `?`).** Aqui o `{{ .RedirectTo }}` **já vem com
+> query string** (`.../callback?selector=...`), então o `token_hash` precisa ser
+> anexado com **`&`**. Se usar `?` (`{{ .RedirectTo }}?token_hash=...`), a URL fica
+> com dois `?` e quebra. Isso é diferente do exemplo padrão da doc da Supabase,
+> onde o `{{ .RedirectTo }}` é a raiz e o caminho é anexado com `/auth/confirm?...`.
 
 ## 4. SMTP custom (Authentication → Emails → SMTP Settings)
 O SMTP nativo da Supabase tem limite muito baixo. Ative **Enable custom SMTP** e
@@ -118,12 +121,24 @@ HS256: tokens HS256 são recusados.
 > Não é necessária nenhuma **secret key** da Supabase no backend: a validação do
 > token é feita com a chave **pública** (JWKS + publishable key).
 
-## Observação sobre multi-device no modo Supabase
+## Multi-device no modo Supabase (produção)
 
-O link do email aponta para `http://localhost:8000/auth/supabase/callback`.
-Clicar **no mesmo computador** funciona. Clicar **em outro dispositivo** (ex.:
-celular) não alcança o `localhost` da sua máquina — para multi-device real no
-modo Supabase é preciso uma **URL pública do backend** (deploy ou um túnel como
-`ngrok`/`cloudflared`), e atualizar a Redirect URL + `BACKEND_PUBLIC_URL` para
-essa URL. O modo **Backend Python** não tem essa limitação (o link é do próprio
-backend e o polling é independente).
+Funciona cross-device (pedir o login num dispositivo e aprovar em outro,
+**fora da mesma rede**), desde que os domínios sejam **públicos**:
+
+- **Site URL**: domínio público do frontend (Vercel).
+- **Redirect URLs**: `https://<backend-publico>/**` (Railway/Render/Fly) — com o
+  `/**` (ver seção 2).
+- `NEXT_PUBLIC_API_URL` (na Vercel) aponta para o backend público; **redeploy** após
+  alterar, pois variáveis `NEXT_PUBLIC_*` são embutidas no build.
+- `FRONTEND_URL` (no backend) aponta para o domínio da Vercel (CORS).
+
+Fluxo: a Supabase envia o link → o link abre o **callback no backend** → o backend
+troca o `token_hash` e marca o pedido (selector) como aprovado → a aba de origem
+detecta por polling e entra. É o mesmo mecanismo de selector/polling do modo
+Backend Python; a Supabase só substitui o envio do email.
+
+> Em **desenvolvimento local / mesma rede**, use o IP da máquina nos mesmos
+> campos (Site URL, Redirect URLs com `/**`, `NEXT_PUBLIC_API_URL`,
+> `BACKEND_PUBLIC_URL`, `FRONTEND_URL`) — ver
+> [Acesso por outro dispositivo na rede](./08-acesso-rede-multidevice.md).
